@@ -104,8 +104,13 @@ def edit_calculation(
     calc.inputs = recomputed.inputs
     calc.result = recomputed.result
     db.commit()
-    db.refresh(calc)
-    return calc
+    db.expire_all()
+
+    return (
+        db.query(Calculation)
+        .filter(Calculation.id == calc_id, Calculation.user_id == current_user.id)
+        .first()
+    )
 
 
 @router.delete("/{calc_id}", status_code=status.HTTP_204_NO_CONTENT)
